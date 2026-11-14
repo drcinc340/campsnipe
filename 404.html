@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CampSnipe.com — Hard-to-Get Spots + Live Friends &amp; Family Crew Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(circle at 50% 0%, #0f2937 0%, #050a10 68%);
+    color: #f8fafc;
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 20px 18px 80px;
+  }
+  .wrap { max-width: 1220px; margin: 0 auto; }
+
+  /* Top Navigation */
+  .topbar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 14px; margin-bottom: 18px;
+  }
+  .brand {
+    display: inline-flex; align-items: center; gap: 12px;
+    padding: 10px 20px; border-radius: 999px;
+    background: rgba(10, 19, 29, 0.90);
+    border: 1px solid rgba(52, 211, 153, 0.45);
+    text-decoration: none; color: #fff;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 12px #10b981; }
+  .brand-name { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 20px; }
+  .brand-name span { color: #34d399; }
+
+  .nav-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .nav-btn {
+    padding: 10px 18px; border-radius: 999px; font-weight: 700; font-size: 13.5px;
+    background: rgba(15, 23, 42, 0.85); color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.25); cursor: pointer; transition: all 0.15s;
+  }
+  .nav-btn:hover { border-color: #34d399; color: #fff; }
+  .nav-btn.active {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #022c22; border-color: #34d399;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
+  }
+
+  /* Live Hot Drops Ticker */
+  .drops-bar {
+    display: flex; align-items: center; gap: 12px; overflow-x: auto;
+    padding: 11px 16px; border-radius: 14px; margin-bottom: 22px;
+    background: rgba(9, 18, 28, 0.90); border: 1px solid rgba(251, 191, 36, 0.38);
+  }
+  .drops-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 700;
+    color: #fde68a; background: rgba(251, 191, 36, 0.16); padding: 5px 10px;
+    border-radius: 6px; white-space: nowrap;
+  }
+  .drop-chip {
+    display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+    padding: 6px 12px; border-radius: 999px; font-size: 12.5px;
+    background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(148, 163, 184, 0.2);
+    color: #e2e8f0; cursor: pointer;
+  }
+  .drop-chip:hover { border-color: #34d399; }
+  .drop-chip b { color: #34d399; }
+
+  .view-section { display: none; }
+  .view-section.active { display: block; }
+
+  /* Hero */
+  .hero-box {
+    display: grid; grid-template-columns: 1.25fr 1fr; gap: 24px; align-items: center;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 900px) { .hero-box { grid-template-columns: 1fr; } }
+  h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(28px, 3.8vw, 44px);
+    font-weight: 800; letter-spacing: -0.03em; line-height: 1.1;
+  }
+  h1 span { color: #34d399; }
+  .hero-sub { color: #cbd5e1; font-size: 16.5px; margin-top: 10px; line-height: 1.5; }
+  .stat-strip { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+  .stat-badge {
+    padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 700;
+    background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(52, 211, 153, 0.35); color: #a7f3d0;
+  }
+
+  .mini-player-card {
+    border-radius: 18px; overflow: hidden; background: #000;
+    border: 1.5px solid rgba(52, 211, 153, 0.45);
+    box-shadow: 0 20px 55px rgba(0,0,0,0.65);
+  }
+  .mini-player-card video { width: 100%; aspect-ratio: 16/9; display: block; }
+  .mp-bar {
+    padding: 10px 14px; background: rgba(10, 18, 28, 0.95);
+    display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;
+  }
+
+  /* 3-Vertical Selector */
+  .vert-tabs {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;
+  }
+  @media (max-width: 720px) { .vert-tabs { grid-template-columns: 1fr; } }
+  .v-btn {
+    padding: 16px 18px; border-radius: 16px; text-align: left; cursor: pointer;
+    background: rgba(11, 20, 31, 0.85); border: 1.5px solid rgba(148, 163, 184, 0.22);
+    color: #f8fafc; transition: all 0.15s;
+  }
+  .v-btn.active {
+    background: linear-gradient(145deg, rgba(6, 78, 59, 0.58), rgba(11, 20, 31, 0.95));
+    border-color: #34d399; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.22);
+  }
+  .v-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 800; }
+  .v-sub { font-size: 13px; color: #94a3b8; margin-top: 3px; }
+
+  /* Interactive Crew Map Panel */
+  .crew-map-shell {
+    padding: 24px; border-radius: 22px; margin-bottom: 24px;
+    background: rgba(8, 16, 26, 0.92); border: 1.5px solid rgba(59, 130, 246, 0.45);
+    box-shadow: 0 25px 70px rgba(0,0,0,0.65);
+  }
+  .cm-header {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+    gap: 12px; margin-bottom: 18px;
+  }
+  .cm-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 800; }
+  .cm-title span { color: #60a5fa; }
+  .cm-meta { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #fde68a; }
+
+  .spots-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px;
+  }
+  .spot-box {
+    padding: 16px 14px; border-radius: 16px; cursor: pointer;
+    background: rgba(15, 23, 42, 0.88); border: 1.5px solid rgba(148, 163, 184, 0.22);
+    transition: all 0.16s ease; position: relative;
+  }
+  .spot-box:hover { transform: translateY(-2px); border-color: #34d399; }
+  .spot-box.pinned {
+    background: linear-gradient(155deg, rgba(30, 58, 138, 0.85), rgba(15, 23, 42, 0.95));
+    border-color: #60a5fa; box-shadow: 0 10px 28px rgba(59, 130, 246, 0.3);
+  }
+  .spot-box.adjacent {
+    background: linear-gradient(155deg, rgba(6, 78, 59, 0.65), rgba(15, 23, 42, 0.95));
+    border: 2px dashed #34d399;
+    box-shadow: 0 0 28px rgba(16, 185, 129, 0.25);
+  }
+  .spot-box.selected {
+    outline: 3px solid #fbbf24;
+  }
+  .sb-num { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 700; color: #94a3b8; }
+  .pinned .sb-num { color: #93c5fd; }
+  .adjacent .sb-num { color: #6ee7b7; }
+  .sb-who { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 800; margin-top: 6px; color: #fff; }
+  .sb-tag {
+    margin-top: 10px; display: inline-block; padding: 4px 9px; border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+    background: rgba(239, 68, 68, 0.18); color: #fca5a5;
+  }
+  .pinned .sb-tag { background: rgba(59, 130, 246, 0.28); color: #dbeafe; }
+  .adjacent .sb-tag { background: rgba(16, 185, 129, 0.28); color: #a7f3d0; }
+
+  /* Two Viral Action Forms */
+  .forms-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 22px;
+  }
+  @media (max-width: 880px) { .forms-grid { grid-template-columns: 1fr; } }
+  .action-card {
+    padding: 26px; border-radius: 22px;
+    background: rgba(10, 18, 29, 0.92); border: 1.5px solid rgba(148, 163, 184, 0.24);
+  }
+  .action-card.green-card { border-color: rgba(52, 211, 153, 0.5); }
+  .action-card.blue-card { border-color: rgba(96, 165, 250, 0.5); }
+  .ac-kicker {
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: #34d399;
+  }
+  .blue-card .ac-kicker { color: #60a5fa; }
+  .ac-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 800; margin-top: 6px; }
+  .ac-desc { font-size: 14px; color: #94a3b8; margin-top: 4px; margin-bottom: 16px; line-height: 1.45; }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .field { margin-bottom: 12px; }
+  label { display: block; font-size: 12.5px; font-weight: 600; color: #cbd5e1; margin-bottom: 5px; }
+  input, select {
+    width: 100%; padding: 11px 13px; border-radius: 10px;
+    background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(148, 163, 184, 0.3);
+    color: #fff; font-size: 14px; font-family: inherit;
+  }
+  .submit-btn {
+    width: 100%; padding: 14px 20px; border-radius: 12px; border: none;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15.5px; font-weight: 800;
+    cursor: pointer; transition: opacity 0.15s; margin-top: 4px;
+  }
+  .submit-btn:hover { opacity: 0.93; }
+  .btn-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; }
+  .btn-green { background: linear-gradient(135deg, #10b981, #059669); color: #022c22; }
+
+  .share-result {
+    display: none; margin-top: 16px; padding: 16px; border-radius: 14px;
+    background: rgba(6, 78, 59, 0.35); border: 1px solid #34d399;
+  }
+  .share-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .s-btn {
+    flex: 1; text-align: center; padding: 11px 14px; border-radius: 10px;
+    font-weight: 700; font-size: 13.5px; text-decoration: none; cursor: pointer; border: none;
+  }
+  .s-sms { background: #10b981; color: #022c22; }
+  .s-copy { background: rgba(15, 23, 42, 0.9); color: #fff; border: 1px solid rgba(148, 163, 184, 0.35); }
+
+  /* Video Suite Tab Styles */
+  .tabs {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px; margin-top: 18px;
+  }
+  .tab-btn {
+    text-align: left; padding: 18px 20px; border-radius: 16px;
+    background: rgba(11, 20, 31, 0.82);
+    border: 1.5px solid rgba(148, 163, 184, 0.22);
+    color: #e2e8f0; cursor: pointer;
+  }
+  .tab-btn.active {
+    background: linear-gradient(145deg, rgba(6, 78, 59, 0.55), rgba(11, 20, 31, 0.95));
+    border-color: #34d399;
+  }
+  .tab-kicker { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #34d399; }
+  .tab-btn.gold-tab .tab-kicker { color: #fbbf24; }
+  .tab-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 800; margin-top: 6px; color: #fff; }
+  .tab-desc { font-size: 13.5px; color: #94a3b8; margin-top: 4px; }
+  .player-shell {
+    margin-top: 20px; border-radius: 22px; overflow: hidden;
+    background: #000; border: 1.5px solid rgba(52, 211, 153, 0.45);
+  }
+  .player-shell video { width: 100%; aspect-ratio: 16 / 9; display: block; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 22px; border-radius: 12px;
+    font-weight: 700; font-size: 14.5px; text-decoration: none; cursor: pointer; border: none;
+  }
+  .btn-play { background: linear-gradient(135deg, #10b981, #059669); color: #022c22; }
+  .btn-dl { background: rgba(15, 23, 42, 0.92); color: #f1f5f9; border: 1px solid rgba(148, 163, 184, 0.32); }
+
+  .downloads-box {
+    margin-top: 28px; padding: 24px; border-radius: 20px;
+    background: rgba(9, 16, 26, 0.88); border: 1px solid rgba(148, 163, 184, 0.22);
+  }
+  .dl-row {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 14px 0; border-top: 1px solid rgba(148, 163, 184, 0.14);
+  }
+  .dl-name { font-weight: 700; font-size: 15.5px; color: #f1f5f9; }
+  .dl-meta { font-size: 13px; color: #94a3b8; margin-top: 2px; }
+  .dl-links { display: flex; gap: 10px; flex-wrap: wrap; }
+  .dl-pill {
+    padding: 9px 15px; border-radius: 9px; font-size: 13px; font-weight: 700;
+    text-decoration: none; color: #a7f3d0; background: rgba(16, 185, 129, 0.14);
+    border: 1px solid rgba(52, 211, 153, 0.35);
+  }
+
+  /* Growth Kit Cards */
+  .kit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; margin-top: 18px; }
+  .kit-card {
+    padding: 22px; border-radius: 18px;
+    background: rgba(10, 18, 29, 0.92); border: 1px solid rgba(52, 211, 153, 0.35);
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .kit-pre {
+    margin-top: 12px; padding: 14px; border-radius: 12px;
+    background: rgba(4, 9, 16, 0.9); border: 1px solid rgba(148, 163, 184, 0.2);
+    font-size: 13px; color: #e2e8f0; white-space: pre-wrap; line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="brand" href="#" onclick="switchView('app'); return false;">
+      <div class="dot"></div>
+      <div class="brand-name">CAMP<span>SNIPE</span>.COM</div>
+    </a>
+    <div class="nav-pills">
+      <button class="nav-btn active" id="nav-app" onclick="switchView('app')">🗺️ Live Crew Map &amp; Spot Sniper</button>
+      <button class="nav-btn" id="nav-videos" onclick="switchView('videos')">🎬 3 Pitch Films &amp; MP4 Downloads</button>
+      <button class="nav-btn" id="nav-growth" onclick="switchView('growth')">🚀 8 AM Drop &amp; Group Captain Kit</button>
+    </div>
+  </div>
+
+  <!-- LIVE HOT DROPS TICKER -->
+  <div class="drops-bar" id="dropsBar">
+    <span class="drops-label">🔥 LIVE CANCELLATION DROPS</span>
+    <div class="drop-chip" onclick="prefillSnipe('camp','Ludington State Park — Beechwood Loop','15')">
+      🏕️ <b>Ludington #B-15</b> (40ft RV • Next to #B-14) • 2m ago
+    </div>
+    <div class="drop-chip" onclick="prefillSnipe('boat','Mackinac Island State Harbor — Pier B','15')">
+      🛥️ <b>Mackinac Pier B #15</b> (50ft Slip • Dual 50A) • 6m ago
+    </div>
+    <div class="drop-chip" onclick="prefillSnipe('plane','Harbor Springs (MGN) — North FBO Ramp','15')">
+      ✈️ <b>Harbor Springs MGN #A-15</b> (Turboprop Tie-Down) • 11m ago
+    </div>
+  </div>
+
+  <!-- ==================== VIEW 1: INTERACTIVE VIRAL CREW MAP APP ==================== -->
+  <div class="view-section active" id="view-app">
+    <div class="hero-box">
+      <div>
+        <h1>Get the Hardest-to-Get Spots.<br/><span>Stay Right Beside Your Crew.</span></h1>
+        <p class="hero-sub">
+          Drop your booked spot pin on the live <strong>Friends &amp; Family Crew Map</strong> so your group can see where you’re parked, docked, or tied down—and snipe cancellations right next to you across <strong>campsites, marina boat slips, and airport plane slips</strong>.
+        </p>
+        <div class="stat-strip">
+          <div class="stat-badge">📍 <span id="statPins">6</span> Active Crew Pins</div>
+          <div class="stat-badge">⚡ <span id="statAlerts">14</span> Proximity Radars Active</div>
+          <div class="stat-badge">💬 <span id="statInvites">29</span> Crew Invites Sent</div>
+        </div>
+      </div>
+
+      <div class="mini-player-card">
+        <video id="heroVideo" controls playsinline preload="metadata" poster="/poster-b2c.jpg?v=hype4" src="/stream/b2c_1080p.mp4?v=hype4"></video>
+        <div class="mp-bar">
+          <span><strong>Watch 43s Consumer Launch Spot</strong></span>
+          <a href="#" onclick="switchView('videos'); return false;" style="color:#34d399; font-weight:700; text-decoration:none;">Watch M&amp;A Pitch (1:06) →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3-VERTICAL SELECTOR -->
+    <div class="vert-tabs">
+      <button class="v-btn active" id="vt-camp" onclick="selectVertical('camp')">
+        <div class="v-title">🏕️ Campsites &amp; RV Loops</div>
+        <div class="v-sub">State Parks &amp; Recreation.gov • Snipe pads beside family</div>
+      </button>
+      <button class="v-btn" id="vt-boat" onclick="selectVertical('boat')">
+        <div class="v-title">🛥️ Marina Boat Slips</div>
+        <div class="v-sub">Mackinac, Boyne, Put-in-Bay • Dock beside your fleet</div>
+      </button>
+      <button class="v-btn" id="vt-plane" onclick="selectVertical('plane')">
+        <div class="v-title">✈️ Airport Plane Slips</div>
+        <div class="v-sub">Harbor Springs, Oshkosh, Sedona • Ramp tie-downs &amp; hangars</div>
+      </button>
+    </div>
+
+    <!-- INTERACTIVE CREW MAP -->
+    <div class="crew-map-shell">
+      <div class="cm-header">
+        <div>
+          <div class="cm-title" id="mapHeading">Live Crew Map: <span>Ludington State Park — Beechwood Loop</span></div>
+          <div style="font-size:13.5px; color:#94a3b8; margin-top:3px;">Click any spot below to <strong>Drop Your Booked Pin</strong> or <strong>Lock a 24/7 Proximity Snipe Radar</strong> right beside your crew.</div>
+        </div>
+        <div class="cm-meta" id="mapMeta">CREW CODE: #CS-LUD14 • JUL 10 – JUL 14</div>
+      </div>
+
+      <div class="spots-grid" id="spotsGrid"></div>
+    </div>
+
+    <!-- TWO VIRAL FORMS -->
+    <div class="forms-grid">
+      <!-- FORM 1: DROP YOUR PIN & TEXT YOUR CREW -->
+      <div class="action-card blue-card">
+        <div class="ac-kicker">STEP 1 // 100% FREE VIRAL CREW INVITE</div>
+        <div class="ac-title">📍 Drop Your Booked Spot Pin</div>
+        <div class="ac-desc">Already have a campsite, boat slip, or plane tie-down booked? Pin it on the map and text the link to your family &amp; friends so they can snipe spots right next to you.</div>
+
+        <div class="field-row">
+          <div>
+            <label>Your Name / Rig / Vessel</label>
+            <input type="text" id="pinName" placeholder="e.g. Adriano's Crew" value="Adriano's Crew" />
+          </div>
+          <div>
+            <label>Your Booked Spot / Slip #</label>
+            <input type="text" id="pinSpot" value="14" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div>
+            <label>Park / Marina / Airport</label>
+            <input type="text" id="pinLoc" value="Ludington State Park — Beechwood Loop" />
+          </div>
+          <div>
+            <label>Trip Dates</label>
+            <input type="text" id="pinDates" value="Jul 10 – Jul 14" />
+          </div>
+        </div>
+        <button class="submit-btn btn-blue" onclick="createCrewPin()">📍 Drop Pin &amp; Create Group Text Link</button>
+
+        <div class="share-result" id="pinResult">
+          <div style="font-weight:800; color:#a7f3d0; font-size:15px;">✅ Your Crew Map Pin Is Live!</div>
+          <div style="font-size:13px; color:#e2e8f0; margin-top:4px;" id="pinUrlDisplay"></div>
+          <div class="share-btns">
+            <a class="s-btn s-sms" id="pinSmsLink" href="#">💬 Text My Crew on iMessage / SMS</a>
+            <button class="s-btn s-copy" onclick="copyCrewLink()">📋 Copy Crew Link</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM 2: SET 24/7 SNIPE ALERT NEXT TO CREW -->
+      <div class="action-card green-card">
+        <div class="ac-kicker">STEP 2 // INSTANT 1-TAP SMS SNIPER</div>
+        <div class="ac-title">⚡ Snipe Hard-to-Get Spots Beside Crew</div>
+        <div class="ac-desc">Everything sold out? Lock our 24/7 cancellation radar onto the spots right next to your family &amp; friends. First alert is <strong>100% free</strong>—invite 2 crew members to unlock <strong>Unlimited VIP Proximity Sniping</strong>!</div>
+
+        <div class="field-row">
+          <div>
+            <label>Your Name</label>
+            <input type="text" id="alName" placeholder="Your Name" />
+          </div>
+          <div>
+            <label>Mobile Phone (For 1-Tap SMS Link)</label>
+            <input type="tel" id="alPhone" placeholder="(248) 555-0199" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div>
+            <label>Target Spot(s) to Snipe</label>
+            <input type="text" id="alTarget" value="Spot #15 (Right Between Crew #14 & #16)" />
+          </div>
+          <div>
+            <label>Rig / Vessel / Aircraft Spec</label>
+            <input type="text" id="alSpec" value="38ft RV • 50A Hookup" />
+          </div>
+        </div>
+        <button class="submit-btn btn-green" onclick="createSnipeAlert()">⚡ Activate 24/7 Proximity Radar (Free)</button>
+
+        <div class="share-result" id="alertResult">
+          <div style="font-weight:800; color:#fde68a; font-size:15px;">🎯 24/7 Proximity Radar Armed!</div>
+          <div style="font-size:13px; color:#e2e8f0; margin-top:4px;">
+            <strong>Unlock Unlimited VIP Sniping Free (0/2 Crew Joined):</strong> Text this Crew Map to 2 friends on the trip to unlock instant priority SMS alerts:
+          </div>
+          <div class="share-btns">
+            <a class="s-btn s-sms" id="alertSmsLink" href="#">💬 Invite 2 Crew Friends via SMS</a>
+            <button class="s-btn s-copy" onclick="copyCrewLink()">📋 Copy Invite Link</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== VIEW 2: 3-FILM VIDEO SUITE ==================== -->
+  <div class="view-section" id="view-videos">
+    <h1>CampSnipe Master Video Suite — <span>Hype Mixes</span></h1>
+    <p class="hero-sub">Stream or download all three 1080p &amp; 720p films for strategic buyers, PE groups, and social media launches.</p>
+
+    <div class="tabs">
+      <button class="tab-btn gold-tab active" onclick="selectFilm('v2_acq', this)">
+        <div class="tab-kicker">FILM 01 // HIGH-ENERGY M&amp;A PITCH (HYPE MIX)</div>
+        <div class="tab-title">Social Crew Map M&amp;A Pitch (1:06)</div>
+        <div class="tab-desc">Studio keynote beat • Zero-CAC crew map across Campsites, Boat Slips &amp; Plane Slips.</div>
+      </button>
+
+      <button class="tab-btn" onclick="selectFilm('b2c', this)">
+        <div class="tab-kicker">FILM 02 // DIRECT-TO-CONSUMER AD (HYPE MIX)</div>
+        <div class="tab-title">Crew Spot Sniper Launch (0:43)</div>
+        <div class="tab-desc">Upbeat commercial energy • See where family &amp; friends are parked &amp; snipe beside them!</div>
+      </button>
+
+      <button class="tab-btn" onclick="selectFilm('v1_acq', this)">
+        <div class="tab-kicker">FILM 03 // STRATEGIC M&amp;A BRIEF (V1)</div>
+        <div class="tab-title">Macro Scarcity Thesis (1:27)</div>
+        <div class="tab-desc">$1.2T outdoor bottleneck, live radar + iPhone checkout &amp; zero-CAC RV buyer funnel.</div>
+      </button>
+    </div>
+
+    <div class="player-shell">
+      <video id="mainPlayer" controls playsinline preload="metadata" poster="/poster-v2_acq.jpg?v=hype4" src="/stream/v2_acq_1080p.mp4?v=hype4"></video>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-play" onclick="const v=document.getElementById('mainPlayer'); v.muted=false; v.play();">
+        ▶ Play Selected Film with Sound
+      </button>
+      <a class="btn btn-dl" id="activeDl1080" href="/download/v2_acq_1080p.mp4?v=hype4">
+        ⬇ Download Selected 1080p MP4
+      </a>
+      <a class="btn btn-dl" id="activeDl720" href="/download/v2_acq_720p.mp4?v=hype4">
+        ⬇ Download Selected 720p Mobile MP4
+      </a>
+    </div>
+
+    <div class="downloads-box">
+      <h2>Direct MP4 Downloads (All 3 Films)</h2>
+      <div class="dl-row">
+        <div>
+          <div class="dl-name">1. High-Energy Company Sale Pitch — Social Crew Map + Land, Water &amp; Air (1:06)</div>
+          <div class="dl-meta">Driving keynote house beat, fast founder VO, Zero-CAC Crew Map across Campsites + Boat Slips + Plane Slips</div>
+        </div>
+        <div class="dl-links">
+          <a class="dl-pill" href="/download/v2_acq_1080p.mp4?v=hype4">⬇ 1080p Master</a>
+          <a class="dl-pill" href="/download/v2_acq_720p.mp4?v=hype4">⬇ 720p Mobile/SMS</a>
+        </div>
+      </div>
+      <div class="dl-row">
+        <div>
+          <div class="dl-name">2. High-Energy Consumer Ad — Hard-to-Get Spots Beside Your Crew (0:43)</div>
+          <div class="dl-meta">Upbeat summer pop dance mix, bright creator VO, Live Crew Map + 1-tap SMS sniping</div>
+        </div>
+        <div class="dl-links">
+          <a class="dl-pill" href="/download/b2c_1080p.mp4?v=hype4">⬇ 1080p Master</a>
+          <a class="dl-pill" href="/download/b2c_720p.mp4?v=hype4">⬇ 720p Mobile/Social</a>
+        </div>
+      </div>
+      <div class="dl-row">
+        <div>
+          <div class="dl-name">3. V1 Macro Strategic M&amp;A Brief — Outdoor Scarcity Overview (1:27)</div>
+          <div class="dl-meta">$1.2T outdoor economy bottleneck, live split-screen radar &amp; RV customer funnel</div>
+        </div>
+        <div class="dl-links">
+          <a class="dl-pill" href="/download/v1_acq_1080p.mp4">⬇ 1080p Master</a>
+          <a class="dl-pill" href="/download/v1_acq_720p.mp4">⬇ 720p Mobile/SMS</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== VIEW 3: 8 AM DROP & GROUP CAPTAIN GROWTH KIT ==================== -->
+  <div class="view-section" id="view-growth">
+    <h1>Zero-CAC Viral Seeding &amp; <span>Group Captain Playbook</span></h1>
+    <p class="hero-sub">Click any button below to copy ready-to-post scripts that turn 1 post or 1 Group Captain into 50–200 active users.</p>
+
+    <div class="kit-grid">
+      <div class="kit-card">
+        <div>
+          <div class="ac-kicker">PLAY 01 // 8:00 AM SOLD-OUT RAGE WINDOW (CAMPING / RV GROUPS)</div>
+          <div class="ac-title">Michigan State Parks &amp; RV Group Post</div>
+          <div class="kit-pre" id="copy-fb">Heads up for anyone who got shut out at 8:00 AM this morning — 2 spots right next to each other in Beechwood Loop at Ludington (#14 & #15) just popped open!
+
+Also, Josh and I built a free live Crew Map for campers where your family and friends can drop pins on their booked campsites so the whole group can snipe cancellations right next to each other (works for marina boat slips & fly-in plane slips too).
+
+Drop your pin or grab a free proximity alert here: __URL__</div>
+        </div>
+        <button class="submit-btn btn-green" style="margin-top:14px;" onclick="copyKit('copy-fb', this)">📋 Copy 8:00 AM Camping Group Post</button>
+      </div>
+
+      <div class="kit-card">
+        <div>
+          <div class="ac-kicker">PLAY 02 // YACHT CLUB CRUISE CAPTAINS &amp; MARINA GROUPS</div>
+          <div class="ac-title">Boat Slip / Rendezvous Fleet Invite</div>
+          <div class="kit-pre" id="copy-boat">Hey Captains — for everyone trying to get transient slips on the same pier at Mackinac Island / Boyne / Put-in-Bay this summer:
+
+We set up a live Pier Crew Map where everyone in our group can pin their boat slip and turn on a 24/7 SMS sniper radar for adjacent slips the second a cancellation drops.
+
+Pin your boat slip on our group map here (100% free): __URL__/?crew=CS-MAC08</div>
+        </div>
+        <button class="submit-btn btn-blue" style="margin-top:14px;" onclick="copyKit('copy-boat', this)">📋 Copy Marina / Yacht Club Invite</button>
+      </div>
+
+      <div class="kit-card">
+        <div>
+          <div class="ac-kicker">PLAY 03 // EAA / CIRRUS / BONANZA FLY-IN ORGANIZERS</div>
+          <div class="ac-title">Airport Ramp &amp; Plane Slip Squadron Map</div>
+          <div class="kit-pre" id="copy-plane">Pilots flying into Harbor Springs (MGN) / Mackinac (MCD) / Oshkosh — we put together a live FBO Ramp Map so our flying group can pin our tie-downs/hangar slips and auto-snipe overnight ramp openings right next to the squadron.
+
+Drop your tail number & ramp pin here: __URL__/?crew=CS-OSH12</div>
+        </div>
+        <button class="submit-btn btn-green" style="margin-top:14px;" onclick="copyKit('copy-plane', this)">📋 Copy Fly-In Pilot Group Invite</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let API_BASE = '';
+  const PERMANENT_SHARE_ORIGIN = 'https://drcinc340.github.io/campsnipe';
+  let CURRENT_VERT = 'camp';
+  let CURRENT_CREW = null;
+  let SELECTED_SPOT = '15';
+  let ALL_CREWS = {
+    'CS-LUD14': {
+      code: 'CS-LUD14',
+      vertical: 'camp',
+      hostName: "Adriano & Josh's Crew",
+      location: 'Ludington State Park — Beechwood Loop',
+      dates: 'Jul 10 – Jul 14',
+      spotId: '14',
+      rigSpec: '36ft Airstream / 50A',
+      members: [
+        { name: "Adriano's Rig", spotId: '14', status: 'BOOKED PIN', role: 'Organizer' },
+        { name: 'Miller Family', spotId: '16', status: 'BOOKED PIN', role: 'Crew' },
+        { name: 'Josh Rig', spotId: '12', status: 'PINNED BY FRIEND', role: 'Crew' }
+      ],
+      watchers: 4
+    },
+    'CS-MAC08': {
+      code: 'CS-MAC08',
+      vertical: 'boat',
+      hostName: 'Great Lakes Rendezvous Crew',
+      location: 'Mackinac Island State Harbor — Pier B',
+      dates: 'Jul 24 – Jul 27',
+      spotId: '14',
+      rigSpec: '44ft Cruiser / Dual 50A',
+      members: [
+        { name: 'Sea Snipe IV', spotId: '14', status: 'DOCKED PIN', role: 'Cruise Capt' },
+        { name: 'Northern Star', spotId: '16', status: 'DOCKED PIN', role: 'Fleet' }
+      ],
+      watchers: 4
+    },
+    'CS-OSH12': {
+      code: 'CS-OSH12',
+      vertical: 'plane',
+      hostName: 'Midwest Squadron Fly-In',
+      location: 'Harbor Springs (MGN) — North FBO Ramp',
+      dates: 'Aug 7 – Aug 9',
+      spotId: '14',
+      rigSpec: 'Pilatus PC-12 / Ramp Tie-Down',
+      members: [
+        { name: 'N880PC (Lead)', spotId: '14', status: 'TIED DOWN', role: 'Flight Lead' },
+        { name: 'N511SR (Cirrus)', spotId: '16', status: 'TIED DOWN', role: 'Wingman' }
+      ],
+      watchers: 2
+    }
+  };
+
+  const VERT_DEFAULTS = {
+    camp: { code: 'CS-LUD14', loc: 'Ludington State Park — Beechwood Loop', spec: '38ft RV • 50A Hookup', dates: 'Jul 10 – Jul 14', unit: 'SPOT' },
+    boat: { code: 'CS-MAC08', loc: 'Mackinac Island State Harbor — Pier B', spec: '44ft Cruiser • Dual 50A', dates: 'Jul 24 – Jul 27', unit: 'SLIP' },
+    plane: { code: 'CS-OSH12', loc: 'Harbor Springs (MGN) — North FBO Ramp', spec: 'Pilatus PC-12 / Tie-Down', dates: 'Aug 7 – Aug 9', unit: 'RAMP' }
+  };
+
+  function apiUrl(p) {
+    if (!p) return p;
+    if (p.startsWith('http://') || p.startsWith('https://')) return p;
+    return (API_BASE || '') + (p.startsWith('/') ? p : '/' + p);
+  }
+
+  async function initTunnelBridge() {
+    if (location.hostname.endsWith('github.io')) {
+      try {
+        const res = await fetch('https://raw.githubusercontent.com/drcinc340/campsnipe/main/tunnel_config.json?t=' + Date.now(), { cache: 'no-store' });
+        if (res.ok) {
+          const cfg = await res.json();
+          if (cfg && cfg.api_url) {
+            API_BASE = cfg.api_url.replace(/\/+$/, '');
+          }
+        }
+      } catch (e) {}
+      if (API_BASE) {
+        const hv = document.getElementById('heroVideo');
+        if (hv) {
+          hv.poster = apiUrl('/poster-b2c.jpg?v=hype4');
+          hv.src = apiUrl('/stream/b2c_1080p.mp4?v=hype4');
+        }
+        const mp = document.getElementById('mainPlayer');
+        if (mp && mp.getAttribute('src') && mp.getAttribute('src').startsWith('/')) {
+          mp.poster = apiUrl(mp.getAttribute('poster'));
+          mp.src = apiUrl(mp.getAttribute('src'));
+        }
+        document.querySelectorAll('a[href^="/download/"]').forEach(a => {
+          a.href = apiUrl(a.getAttribute('href'));
+        });
+      }
+    }
+  }
+
+  function switchView(view) {
+    ['app', 'videos', 'growth'].forEach(v => {
+      document.getElementById('view-' + v).classList.toggle('active', v === view);
+      document.getElementById('nav-' + v).classList.toggle('active', v === view);
+    });
+    if (view !== 'app') {
+      try { document.getElementById('heroVideo').pause(); } catch {}
+    }
+    if (view !== 'videos') {
+      try { document.getElementById('mainPlayer').pause(); } catch {}
+    }
+  }
+
+  async function loadAppState(crewCode) {
+    if (ALL_CREWS[crewCode || 'CS-LUD14']) {
+      CURRENT_CREW = ALL_CREWS[crewCode || 'CS-LUD14'];
+      CURRENT_VERT = CURRENT_CREW.vertical || 'camp';
+      renderCrewMap();
+    }
+    await initTunnelBridge();
+    const q = crewCode ? `?crew=${encodeURIComponent(crewCode)}` : '';
+    const r = await fetch(apiUrl('/api/state' + q)).then(x => x.json()).catch(() => null);
+    if (!r || !r.ok) return;
+    if (r.stats) {
+      document.getElementById('statPins').textContent = r.stats.pinsCreated;
+      document.getElementById('statAlerts').textContent = r.stats.alertsCreated;
+      document.getElementById('statInvites').textContent = r.stats.viralInvitesSent;
+    }
+    (r.allCrews || []).forEach(c => { ALL_CREWS[c.code] = c; });
+    if (r.crew) {
+      CURRENT_CREW = r.crew;
+      CURRENT_VERT = r.crew.vertical || 'camp';
+      renderCrewMap();
+    }
+  }
+
+  function selectVertical(v) {
+    CURRENT_VERT = v;
+    ['camp', 'boat', 'plane'].forEach(k => {
+      document.getElementById('vt-' + k).classList.toggle('active', k === v);
+    });
+    const def = VERT_DEFAULTS[v];
+    document.getElementById('pinLoc').value = def.loc;
+    document.getElementById('pinDates').value = def.dates;
+    document.getElementById('alSpec').value = def.spec;
+    if (ALL_CREWS[def.code]) {
+      CURRENT_CREW = ALL_CREWS[def.code];
+    }
+    renderCrewMap();
+  }
+
+  function renderCrewMap() {
+    const c = CURRENT_CREW || ALL_CREWS['CS-LUD14'];
+    if (!c) return;
+    const unit = VERT_DEFAULTS[c.vertical || 'camp'].unit;
+    document.getElementById('mapHeading').innerHTML = `Live Crew Map: <span>${c.location}</span>`;
+    document.getElementById('mapMeta').textContent = `CREW CODE: #${c.code} • ${c.dates.toUpperCase()} • ${c.watchers || 2} CREW WATCHING`;
+
+    const pinnedMap = {};
+    (c.members || []).forEach(m => { pinnedMap[String(m.spotId)] = m; });
+    const pinnedNums = Object.keys(pinnedMap).map(n => parseInt(n, 10));
+
+    const spots = ['11', '12', '13', '14', '15', '16', '17', '18'];
+    const grid = document.getElementById('spotsGrid');
+    grid.innerHTML = '';
+
+    spots.forEach(s => {
+      const num = parseInt(s, 10);
+      const member = pinnedMap[s];
+      const isAdj = !member && pinnedNums.some(pn => Math.abs(pn - num) === 1);
+      const div = document.createElement('div');
+      div.className = 'spot-box' + (member ? ' pinned' : (isAdj ? ' adjacent' : '')) + (SELECTED_SPOT === s ? ' selected' : '');
+      div.onclick = () => {
+        SELECTED_SPOT = s;
+        document.getElementById('pinSpot').value = s;
+        document.getElementById('alTarget').value = `${unit} #${s} (${isAdj ? 'Right Next to Crew!' : c.location})`;
+        renderCrewMap();
+      };
+      div.innerHTML = `
+        <div class="sb-num">${unit} #${s}</div>
+        <div class="sb-who">${member ? '📍 ' + member.name : (isAdj ? '🎯 Snipe Next to Crew' : 'Occupied')}</div>
+        <div class="sb-tag">${member ? member.status : (isAdj ? '⚡ CLICK TO SNIPE' : 'SOLD OUT')}</div>
+      `;
+      grid.appendChild(div);
+    });
+  }
+
+  function prefillSnipe(vert, loc, spot) {
+    switchView('app');
+    selectVertical(vert);
+    SELECTED_SPOT = spot;
+    document.getElementById('alTarget').value = `Spot #${spot} @ ${loc}`;
+    renderCrewMap();
+    document.getElementById('alName').focus();
+  }
+
+  function getShareUrl(code) {
+    return `${PERMANENT_SHARE_ORIGIN}/?crew=${encodeURIComponent(code)}`;
+  }
+
+  async function createCrewPin() {
+    const payload = {
+      vertical: CURRENT_VERT,
+      hostName: document.getElementById('pinName').value || "My Crew",
+      spotId: document.getElementById('pinSpot').value || "14",
+      location: document.getElementById('pinLoc').value,
+      dates: document.getElementById('pinDates').value,
+      crewCode: CURRENT_CREW ? CURRENT_CREW.code : ''
+    };
+    const r = await fetch(apiUrl('/api/crew/create'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(x => x.json()).catch(() => null);
+    if (r && r.ok) {
+      CURRENT_CREW = r.crew;
+      ALL_CREWS[r.crew.code] = r.crew;
+      renderCrewMap();
+      document.getElementById('statPins').textContent = r.stats.pinsCreated;
+      document.getElementById('statInvites').textContent = r.stats.viralInvitesSent;
+    } else if (CURRENT_CREW) {
+      CURRENT_CREW.members = CURRENT_CREW.members || [];
+      CURRENT_CREW.members.push({ name: payload.hostName, spotId: String(payload.spotId), status: 'PINNED BY FRIEND', role: 'Crew' });
+      renderCrewMap();
+    }
+    const activeCode = CURRENT_CREW ? CURRENT_CREW.code : 'CS-LUD14';
+    const shareUrl = getShareUrl(activeCode);
+    document.getElementById('pinUrlDisplay').textContent = `Share Link: ${shareUrl}`;
+    const smsTxt = `Hey! We pinned Spot #${payload.spotId} at ${payload.location} (${payload.dates}) on CampSnipe. Tap here to see our spot on the map and snipe an opening right next to us: ${shareUrl}`;
+    document.getElementById('pinSmsLink').href = `sms:?&body=${encodeURIComponent(smsTxt)}`;
+    document.getElementById('pinResult').style.display = 'block';
+  }
+
+  async function createSnipeAlert() {
+    const payload = {
+      vertical: CURRENT_VERT,
+      name: document.getElementById('alName').value || 'Crew Member',
+      phone: document.getElementById('alPhone').value || '',
+      location: document.getElementById('pinLoc').value,
+      dates: document.getElementById('pinDates').value,
+      targetSpots: document.getElementById('alTarget').value,
+      rigSpec: document.getElementById('alSpec').value,
+      crewCode: CURRENT_CREW ? CURRENT_CREW.code : 'CS-LUD14'
+    };
+    const r = await fetch(apiUrl('/api/alerts/create'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(x => x.json()).catch(() => null);
+    if (r && r.ok) {
+      document.getElementById('statAlerts').textContent = r.stats.alertsCreated;
+    }
+    const shareUrl = getShareUrl(payload.crewCode);
+    const smsTxt = `We're using CampSnipe's live Crew Map to grab spots right next to each other at ${payload.location} (${payload.dates}). Drop your pin or set a radar here: ${shareUrl}`;
+    document.getElementById('alertSmsLink').href = `sms:?&body=${encodeURIComponent(smsTxt)}`;
+    document.getElementById('alertResult').style.display = 'block';
+  }
+
+  function copyCrewLink() {
+    const code = CURRENT_CREW ? CURRENT_CREW.code : 'CS-LUD14';
+    navigator.clipboard.writeText(getShareUrl(code));
+    alert('Copied Crew Map link: ' + getShareUrl(code));
+  }
+
+  function copyKit(id, btn) {
+    const txt = document.getElementById(id).textContent.replace(/__URL__/g, PERMANENT_SHARE_ORIGIN);
+    navigator.clipboard.writeText(txt);
+    const old = btn.textContent;
+    btn.textContent = '✅ Copied to Clipboard!';
+    setTimeout(() => { btn.textContent = old; }, 2000);
+  }
+
+  // Video Suite Selector
+  const FILMS = {
+    v2_acq: {
+      src: '/stream/v2_acq_1080p.mp4?v=hype4',
+      poster: '/poster-v2_acq.jpg?v=hype4',
+      dl1080: '/download/v2_acq_1080p.mp4?v=hype4',
+      dl720: '/download/v2_acq_720p.mp4?v=hype4'
+    },
+    b2c: {
+      src: '/stream/b2c_1080p.mp4?v=hype4',
+      poster: '/poster-b2c.jpg?v=hype4',
+      dl1080: '/download/b2c_1080p.mp4?v=hype4',
+      dl720: '/download/b2c_720p.mp4?v=hype4'
+    },
+    v1_acq: {
+      src: '/stream/v1_acq_1080p.mp4',
+      poster: '/poster-v1_acq.jpg',
+      dl1080: '/download/v1_acq_1080p.mp4',
+      dl720: '/download/v1_acq_720p.mp4'
+    }
+  };
+
+  function selectFilm(key, btnEl) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btnEl.classList.add('active');
+    const cfg = FILMS[key];
+    const v = document.getElementById('mainPlayer');
+    v.pause();
+    v.poster = apiUrl(cfg.poster);
+    v.src = apiUrl(cfg.src);
+    v.load();
+    v.play().catch(() => {});
+    document.getElementById('activeDl1080').href = apiUrl(cfg.dl1080);
+    document.getElementById('activeDl720').href = apiUrl(cfg.dl720);
+  }
+
+  // Replace __URL__ placeholders in Growth Kit
+  document.querySelectorAll('.kit-pre').forEach(el => {
+    el.textContent = el.textContent.replace(/__URL__/g, PERMANENT_SHARE_ORIGIN);
+  });
+
+  // Handle URL params (?film=... or ?crew=... or ?view=growth)
+  const params = new URLSearchParams(location.search);
+  const qFilm = params.get('film');
+  const qCrew = params.get('crew');
+  const qView = params.get('view');
+
+  loadAppState(qCrew || 'CS-LUD14').then(() => {
+    if (qFilm && FILMS[qFilm]) {
+      switchView('videos');
+      const idx = qFilm === 'v2_acq' ? 0 : (qFilm === 'b2c' ? 1 : 2);
+      const btn = document.querySelectorAll('.tab-btn')[idx];
+      if (btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const v = document.getElementById('mainPlayer');
+        v.poster = apiUrl(FILMS[qFilm].poster);
+        v.src = apiUrl(FILMS[qFilm].src);
+        document.getElementById('activeDl1080').href = apiUrl(FILMS[qFilm].dl1080);
+        document.getElementById('activeDl720').href = apiUrl(FILMS[qFilm].dl720);
+      }
+    } else if (qView === 'growth' || location.pathname.endsWith('/growth')) {
+      switchView('growth');
+    } else if (qView === 'videos' || location.pathname.endsWith('/videos')) {
+      switchView('videos');
+    }
+  });
+</script>
+</body>
+</html>

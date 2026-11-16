@@ -730,7 +730,95 @@ Drop your tail number & ramp pin here: __URL__/?crew=CS-OSH12</div>
     }
   }
 
+  const SEED_LIVE_DROPS = [
+    {
+      id: 'recgov-232458-304',
+      vertical: 'camp',
+      source: 'LIVE RECREATION.GOV API',
+      adjacentPair: true,
+      badge: '🔥 2 ADJACENT SPOTS LIVE',
+      place: 'Sleeping Bear Dunes — D.H. Day (Sites #304 & #305)',
+      dates: 'May 1–4',
+      spec: 'Beach Access • Glen Arbor / Empire MI • 164 open in window',
+      ago: 'LIVE NOW',
+      crewCode: 'CS-LUD14',
+      spotNum: '304',
+      bookUrl: 'https://www.recreation.gov/camping/campsites/826'
+    },
+    {
+      id: 'recgov-247602-17',
+      vertical: 'camp',
+      source: 'LIVE RECREATION.GOV API',
+      adjacentPair: true,
+      badge: '🔥 2 ADJACENT SPOTS LIVE',
+      place: 'Pictured Rocks — Twelve Mile Beach (Sites #17 & #18)',
+      dates: 'May 15–17',
+      spec: 'Lake Superior Waterfront • Grand Marais MI • 15 open in window',
+      ago: 'LIVE NOW',
+      crewCode: 'CS-LUD14',
+      spotNum: '17',
+      bookUrl: 'https://www.recreation.gov/camping/campsites/10005604'
+    },
+    {
+      id: 'recgov-232457-G001',
+      vertical: 'camp',
+      source: 'LIVE RECREATION.GOV API',
+      adjacentPair: false,
+      badge: '🟢 LIVE REC.GOV DROP',
+      place: 'Sleeping Bear Dunes — Platte River (Site #G001)',
+      dates: 'May 15–18',
+      spec: 'RV / Electric • Walk to Lake Michigan • 4 open in window',
+      ago: 'LIVE NOW',
+      crewCode: 'CS-LUD14',
+      spotNum: 'G001',
+      bookUrl: 'https://www.recreation.gov/camping/campsites/804'
+    },
+    {
+      id: 'midnr-lud-14-15',
+      vertical: 'camp',
+      source: 'MiDNR CAMIS RADAR',
+      adjacentPair: true,
+      badge: '🔥 2 SIDE-BY-SIDE SPOTS',
+      place: 'Ludington State Park (Beechwood #13 & #15 — Next to Crew #14)',
+      dates: 'Jul 10–14',
+      spec: '40ft RV • 50A Full Hookup • Adjacent to Beechwood Crew',
+      ago: '2m ago',
+      crewCode: 'CS-LUD14',
+      spotNum: '15',
+      bookUrl: 'https://midnrreservations.com/'
+    },
+    {
+      id: 'marina-mac-15',
+      vertical: 'boat',
+      source: 'STATE HARBOR / DOCKWA RADAR',
+      adjacentPair: true,
+      badge: '⚓ ADJACENT PIER SLIP',
+      place: 'Mackinac Island State Harbor (Pier B Slip #15 — Next to #14)',
+      dates: 'Jul 24–27',
+      spec: '50ft LOA • Dual 50A Shore Power • Next to Pier B Crew',
+      ago: '3m ago',
+      crewCode: 'CS-MAC08',
+      spotNum: '15',
+      bookUrl: 'https://midnrreservations.com/'
+    },
+    {
+      id: 'fbo-mgn-15',
+      vertical: 'plane',
+      source: 'FBO RAMP RADAR',
+      adjacentPair: true,
+      badge: '✈️ SQUADRON RAMP SLOT',
+      place: 'Harbor Springs Airport KMGN (North FBO Ramp #15 — Next to #14)',
+      dates: 'Aug 7–9',
+      spec: 'Turboprop / Cirrus / Bonanza Overnight Tie-Down + GPU',
+      ago: '1m ago',
+      crewCode: 'CS-OSH12',
+      spotNum: '15',
+      bookUrl: 'https://www.airnav.com/airport/KMGN'
+    }
+  ];
+
   async function loadAppState(crewCode) {
+    renderHotDrops(SEED_LIVE_DROPS, new Date().toISOString(), 3);
     if (ALL_CREWS[crewCode || 'CS-LUD14']) {
       CURRENT_CREW = ALL_CREWS[crewCode || 'CS-LUD14'];
       CURRENT_VERT = CURRENT_CREW.vertical || 'camp';
@@ -747,7 +835,7 @@ Drop your tail number & ramp pin here: __URL__/?crew=CS-OSH12</div>
       return;
     }
     if (!r || !r.ok) return;
-    if (r.hotDrops) {
+    if (r.hotDrops && r.hotDrops[0] && r.hotDrops[0].bookUrl) {
       renderHotDrops(r.hotDrops, r.lastPolledAt, r.liveRecGovCount);
     }
     if (r.stats) {
